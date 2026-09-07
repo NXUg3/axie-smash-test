@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Axie Smash: VibeAthon Edition</title>
+<title>Axie Smash</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   html, body {
@@ -168,6 +168,22 @@
   .credits-crawl .credit-block { margin-bottom:26px; }
   .credits-crawl .credit-role { font-size:11px; color:#888; letter-spacing:2px; text-transform:uppercase; margin-bottom:4px; }
   .credits-crawl .credit-name { font-size:18px; color:#fff; font-weight:bold; }
+  .credits-logo-img { display:block; width:min(340px,72vw); max-height:190px; object-fit:contain; margin:0 auto 8px; filter:drop-shadow(0 0 12px rgba(72,190,255,.55)); }
+  .credits-partners { margin:36px auto 0; max-width:560px; padding:16px; border-top:1px solid rgba(255,207,64,.65); border-bottom:1px solid rgba(255,207,64,.65); color:#ffcf40; font-size:16px; font-weight:bold; letter-spacing:2px; }
+  .partner-logos { display:flex; align-items:center; justify-content:center; gap:18px; margin-top:14px; }
+  .partner-logo { width:116px; height:58px; object-fit:contain; filter:drop-shadow(0 2px 5px rgba(0,0,0,.7)); }
+  .partner-logo.sky-mavis { background:#f5f8ff; border-radius:6px; padding:6px; }
+
+  /* ================= HELP ================= */
+  #screen-help { background:radial-gradient(circle at 18% 18%, rgba(46,163,255,.22), transparent 40%), radial-gradient(circle at 85% 78%, rgba(61,220,97,.18), transparent 42%), #080814; overflow:auto; }
+  .help-panel { width:min(760px, calc(100% - 56px)); margin:34px auto; padding:24px 30px; border:2px solid rgba(255,207,64,.7); border-radius:14px; background:rgba(4,5,17,.9); box-shadow:0 0 32px rgba(46,163,255,.2); }
+  .help-title { color:#ffcf40; font-size:32px; text-align:center; letter-spacing:4px; text-shadow:2px 2px 0 #b3001b; margin-bottom:10px; }
+  .help-lead { color:#dfefff; text-align:center; font-size:14px; line-height:1.55; margin:0 auto 18px; max-width:620px; }
+  .help-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .help-card { border:1px solid rgba(127,255,212,.35); background:rgba(255,255,255,.045); border-radius:8px; padding:14px; }
+  .help-card h3 { color:#7fffd4; margin:0 0 7px; font-size:14px; letter-spacing:1px; }
+  .help-card p { color:#fff; font-size:12px; line-height:1.5; margin:0; }
+  @media (max-width:650px) { .help-grid { grid-template-columns:1fr; } .help-panel { margin:22px auto; padding:20px; } }
 
   /* ================= CHAR SELECT (réplica SF6) ================= */
   #screen-charselect {
@@ -332,6 +348,15 @@
     <div class="pd-grid" id="pd-grid"></div>
   </div>
 
+  <!-- ============ HELP ============ -->
+  <div id="screen-help" class="screen hidden">
+    <div class="help-panel">
+      <div class="help-title" id="help-title-text">HELP</div>
+      <p class="help-lead" id="help-lead-text"></p>
+      <div class="help-grid" id="help-grid"></div>
+    </div>
+  </div>
+
   <!-- ============ CRÉDITOS ============ -->
   <div id="screen-credits" class="screen hidden">
     <div class="credits-viewport">
@@ -341,12 +366,12 @@
 
   <!-- ============ CHAR SELECT (réplica SF6) ============ -->
   <div id="screen-charselect" class="screen hidden">
-    <div class="cs-title">SELECT CHARACTERS</div>
+    <div class="cs-title" id="cs-title-text">SELECT CHARACTERS</div>
     <div class="cs-main">
       <div class="portrait-col portrait-col-left">
         <div class="portrait-frame-lg"><img id="p1-portrait-img" class="portrait-img" alt="P1"></div>
         <div class="portrait-name" id="p1-portrait-label">KOTARO</div>
-        <div class="portrait-subtitle">EL AXIE BLANCO · BESTIA</div>
+        <div class="portrait-subtitle" id="p1-portrait-subtitle">EL AXIE BLANCO · BESTIA</div>
         <div class="portrait-tag">1P</div>
         <div class="core-chips" id="p1-core-parts-select"></div>
         <div class="stats-panel" id="p1-stats-panel"></div>
@@ -360,7 +385,7 @@
       <div class="portrait-col portrait-col-right">
         <div class="portrait-frame-lg"><img id="p2-portrait-img" class="portrait-img" alt="P2"></div>
         <div class="portrait-name" id="p2-portrait-label">VERDOZO</div>
-        <div class="portrait-subtitle">EL AXIE VERDE · PLANTA</div>
+        <div class="portrait-subtitle" id="p2-portrait-subtitle">EL AXIE VERDE · PLANTA</div>
         <div class="portrait-tag" id="p2-portrait-tag">2P</div>
         <div class="core-chips" id="p2-core-parts-select"></div>
         <div class="stats-panel" id="p2-stats-panel"></div>
@@ -490,6 +515,7 @@
       m_versus: 'VERSUS', m_versus_desc: 'Pelea local contra un amigo en la misma pantalla.',
       m_multi: 'MULTIJUGADOR', m_multi_desc: 'Modo online en desarrollo.', m_soon: 'PRÓXIMAMENTE',
       m_pdata: 'PLAYER DATA', m_pdata_desc: 'Consulta tus récords y estadísticas de combate.',
+      m_help: 'AYUDA', m_help_desc: 'Conoce el combate, clases, atributos y controles.',
       m_controls: 'CONTROLES', m_controls_desc: 'Remapea teclado, mando o activa controles táctiles.',
       m_options: 'OPCIONES', m_options_desc: 'Configura resolución, FPS, idioma y volumen de audio.',
       m_credits: 'CRÉDITOS', m_credits_desc: 'Ficha técnica del equipo y herramientas de desarrollo.',
@@ -502,18 +528,25 @@
       ctrl_gamepad_ok:'Mando detectado ✔', ctrl_gamepad_none:'No se detecta ningún mando. Presiona un botón para conectar.',
       ctrl_touch_toggle:'Mostrar controles táctiles en combate',
       pd_title: 'PLAYER DATA', pd_matches: 'COMBATES JUGADOS', pd_p1: 'VICTORIAS J1', pd_p2: 'VICTORIAS J2', pd_cpu: 'VICTORIAS CPU', pd_overdrive: 'OVERDRIVES USADOS',
-      cs_confirm: '✕ CONFIRM', cs_back: '◯ BACK', cs_random: '□ RANDOM', cs_commandlist: '△ COMMAND LIST', cs_settings: '⚙ CONTROL SETTINGS',
+      cs_title:'SELECCIONA PERSONAJES', cs_confirm: '✕ CONFIRMAR', cs_back: '◯ REGRESAR', cs_random: '□ ALEATORIO', cs_commandlist: '△ LISTA DE COMANDOS', cs_settings: '⚙ AJUSTES DE CONTROL',
+      kotaro_subtitle:'EL AXIE BLANCO · BESTIA', verdozo_subtitle:'EL AXIE VERDE · PLANTA',
       cs_grid_label: '1P: WASD  ·  2P: FLECHAS',
       stat_type: 'TIPO', stat_speed: 'VELOCIDAD', stat_range: 'RANGO EFECTIVO', stat_ease: 'FACILIDAD DE USO',
       hud_j1: 'JUGADOR 1', hud_j2: 'JUGADOR 2', hud_cpu: 'CPU',
       victory_of: '¡VICTORIA DE ', draw_text: '¡EMPATE!',
+      victory_rematch:'REVANCHA', victory_menu:'MENÚ PRINCIPAL',
       watermark: '⚠️ PROTOTIPO EN DESARROLLO - NO ES UNA VERSIÓN FINAL — ⚠️ PROTOTIPO EN DESARROLLO - NO ES UNA VERSIÓN FINAL —',
       back: '◀ REGRESAR',
       controls_local: 'P1: A/D mover·W saltar·J básico·K especial·L OVERDRIVE   |   P2: ←/→ mover·↑ saltar·Ctrl básico·Shift especial·/ OVERDRIVE',
       controls_ai: 'P1: A/D mover · W saltar · J básico · K especial · L OVERDRIVE (con AXP lleno)',
       cl_title: 'LISTA DE COMANDOS', cl_close: 'CERRAR',
       credits_role_direction:'Dirección y diseño', credits_role_engine:'Motor y programación', credits_role_ai:'Desarrollo asistido por IA',
-      credits_role_art:'Arte procedural', credits_role_design:'Referencias de diseño UI/UX', credits_role_hackathon:'Evento',
+      help_title:'AYUDA', help_lead:'Axie Smash es un juego de combate arcade local: elige a tu Axie, domina sus movimientos y vacía la barra de vida rival antes de que termine el tiempo.',
+      help_combat_title:'COMBATE', help_combat:'Muévete, salta y ataca. El golpe básico es rápido; el especial alcanza más lejos y causa mayor daño. Con AXP completo, activa OVERDRIVE para potenciar tu ofensiva.',
+      help_classes_title:'CLASES', help_classes:'Kotaro es el Axie Blanco de clase Bestia: rápido y agresivo. Verdozo es el Axie Verde de clase Planta: equilibrado, resistente y de rango medio.',
+      help_stats_title:'ATRIBUTOS Y ESTADÍSTICAS', help_stats:'TIPO define el estilo. VELOCIDAD determina movilidad. RANGO EFECTIVO indica la distancia segura de ataque. FACILIDAD DE USO orienta la complejidad del luchador.',
+      help_controls_title:'CONTROLES', help_controls:'J1: A/D para mover, W para saltar, J básico, K especial y L OVERDRIVE. J2: flechas para mover/saltar, Ctrl básico, Shift especial y / OVERDRIVE. Puedes remapearlos en Controles.',
+      credits_role_art:'Arte y herramientas de IA', credits_role_design:'Referencias de diseño UI/UX', credits_role_partners:'PARTNERS', credits_subtitle:'JUEGO DE LUCHA ARCADE', credits_thanks:'AGRADECIMIENTOS ESPECIALES', credits_created:'CREADO POR',
     },
     en: {
       press_start: 'PRESS START', menu_title: 'MAIN MENU',
@@ -521,6 +554,7 @@
       m_versus: 'VERSUS', m_versus_desc: 'Local fight against a friend on the same screen.',
       m_multi: 'MULTIPLAYER', m_multi_desc: 'Online mode in development.', m_soon: 'COMING SOON',
       m_pdata: 'PLAYER DATA', m_pdata_desc: 'Check your combat records and stats.',
+      m_help: 'HELP', m_help_desc: 'Learn combat, classes, attributes and controls.',
       m_controls: 'CONTROLS', m_controls_desc: 'Remap keyboard, gamepad, or enable touch controls.',
       m_options: 'OPTIONS', m_options_desc: 'Configure resolution, FPS, language and audio volume.',
       m_credits: 'CREDITS', m_credits_desc: 'Team roster and development tools.',
@@ -533,18 +567,45 @@
       ctrl_gamepad_ok:'Gamepad detected ✔', ctrl_gamepad_none:'No gamepad detected. Press any button to connect.',
       ctrl_touch_toggle:'Show touch controls in battle',
       pd_title: 'PLAYER DATA', pd_matches: 'MATCHES PLAYED', pd_p1: 'P1 WINS', pd_p2: 'P2 WINS', pd_cpu: 'CPU WINS', pd_overdrive: 'OVERDRIVES USED',
-      cs_confirm: '✕ CONFIRM', cs_back: '◯ BACK', cs_random: '□ RANDOM', cs_commandlist: '△ COMMAND LIST', cs_settings: '⚙ CONTROL SETTINGS',
+      cs_title:'SELECT CHARACTERS', cs_confirm: '✕ CONFIRM', cs_back: '◯ BACK', cs_random: '□ RANDOM', cs_commandlist: '△ COMMAND LIST', cs_settings: '⚙ CONTROL SETTINGS',
+      kotaro_subtitle:'THE WHITE AXIE · BEAST', verdozo_subtitle:'THE GREEN AXIE · PLANT',
       cs_grid_label: '1P: WASD  ·  2P: ARROWS',
       stat_type: 'TYPE', stat_speed: 'SPEED', stat_range: 'EFFECTIVE RANGE', stat_ease: 'EASE OF USE',
       hud_j1: 'PLAYER 1', hud_j2: 'PLAYER 2', hud_cpu: 'CPU',
       victory_of: 'VICTORY FOR ', draw_text: 'DRAW!',
+      victory_rematch:'REMATCH', victory_menu:'MAIN MENU',
       watermark: '⚠️ PROTOTYPE IN DEVELOPMENT - NOT A FINAL VERSION — ⚠️ PROTOTYPE IN DEVELOPMENT - NOT A FINAL VERSION —',
       back: '◀ BACK',
       controls_local: 'P1: A/D move·W jump·J basic·K special·L OVERDRIVE   |   P2: ←/→ move·↑ jump·Ctrl basic·Shift special·/ OVERDRIVE',
       controls_ai: 'P1: A/D move · W jump · J basic · K special · L OVERDRIVE (AXP full)',
       cl_title: 'COMMAND LIST', cl_close: 'CLOSE',
       credits_role_direction:'Direction & Design', credits_role_engine:'Engine & Programming', credits_role_ai:'AI-assisted development',
-      credits_role_art:'Procedural art', credits_role_design:'UI/UX design references', credits_role_hackathon:'Event',
+      help_title:'HELP', help_lead:'Axie Smash is a local arcade fighting game: choose an Axie, master its moves, and empty the opponent’s health bar before time runs out.',
+      help_combat_title:'COMBAT', help_combat:'Move, jump and attack. Basic attacks are fast; specials have more reach and damage. With full AXP, activate OVERDRIVE to boost your offense.',
+      help_classes_title:'CLASSES', help_classes:'Kotaro is the White Beast Axie: fast and aggressive. Verdozo is the Green Plant Axie: balanced, durable and mid-range.',
+      help_stats_title:'ATTRIBUTES & STATS', help_stats:'TYPE defines the style. SPEED determines mobility. EFFECTIVE RANGE shows safe attack distance. EASE OF USE indicates a fighter’s complexity.',
+      help_controls_title:'CONTROLS', help_controls:'P1: A/D move, W jump, J basic, K special and L OVERDRIVE. P2: arrows move/jump, Ctrl basic, Shift special and / OVERDRIVE. Remap them in Controls.',
+      credits_role_art:'Art & AI tools', credits_role_design:'UI/UX design references', credits_role_partners:'PARTNERS', credits_subtitle:'ARCADE FIGHTING GAME', credits_thanks:'SPECIAL ACKNOWLEDGMENTS', credits_created:'CREATED BY',
+    },
+    ja: {
+      press_start:'PRESS START', menu_title:'メインメニュー', m_arcade:'ARCADE', m_arcade_desc:'CPUとの連続バトルに挑戦します。',
+      m_versus:'VERSUS', m_versus_desc:'同じ画面で友達と対戦します。', m_multi:'マルチプレイヤー', m_multi_desc:'オンラインモードは開発中です。', m_soon:'近日公開',
+      m_pdata:'PLAYER DATA', m_pdata_desc:'戦績とバトル統計を確認します。', m_help:'ヘルプ', m_help_desc:'バトル、クラス、能力、操作を確認します。',
+      m_controls:'操作設定', m_controls_desc:'キーボード、ゲームパッド、タッチ操作を設定します。', m_options:'オプション', m_options_desc:'解像度、FPS、言語、音量を設定します。',
+      m_credits:'クレジット', m_credits_desc:'制作チームと開発ツール。', m_exit:'終了', m_exit_desc:'タイトル画面に戻ります。',
+      options_title:'オプション', opt_res:'解像度', opt_fps:'FPS', opt_lang:'言語', opt_master:'マスター音量', opt_sfx:'効果音', opt_save:'保存して戻る',
+      controls_title:'操作設定', tab_keyboard:'キーボード', tab_gamepad:'ゲームパッド', tab_touch:'タッチ', ctrl_left:'左', ctrl_right:'右', ctrl_jump:'ジャンプ', ctrl_basic:'通常攻撃', ctrl_special:'必殺技', ctrl_overdrive:'オーバードライブ',
+      ctrl_remap:'変更', ctrl_listening:'入力待機中...', ctrl_p1:'プレイヤー 1', ctrl_p2:'プレイヤー 2', ctrl_gamepad_ok:'ゲームパッドを検出 ✔', ctrl_gamepad_none:'ゲームパッドが見つかりません。ボタンを押して接続してください。', ctrl_touch_toggle:'バトルでタッチ操作を表示',
+      pd_title:'PLAYER DATA', pd_matches:'対戦数', pd_p1:'P1 勝利', pd_p2:'P2 勝利', pd_cpu:'CPU 勝利', pd_overdrive:'OVERDRIVE 使用数',
+      cs_title:'キャラクターセレクト', cs_confirm:'✕ 決定', cs_back:'◯ 戻る', cs_random:'□ ランダム', cs_commandlist:'△ コマンド一覧', cs_settings:'⚙ 操作設定', kotaro_subtitle:'白のアクシー · ビースト', verdozo_subtitle:'緑のアクシー · プラント', cs_grid_label:'1P: WASD · 2P: 矢印キー',
+      stat_type:'タイプ', stat_speed:'スピード', stat_range:'有効範囲', stat_ease:'使いやすさ', hud_j1:'プレイヤー 1', hud_j2:'プレイヤー 2', hud_cpu:'CPU', victory_of:'勝者：', draw_text:'引き分け！', victory_rematch:'再戦', victory_menu:'メインメニュー',
+      watermark:'⚠️ 開発中のプロトタイプです — ⚠️ 開発中のプロトタイプです —', back:'◀ 戻る', controls_local:'P1: A/D 移動・W ジャンプ・J 通常・K 必殺・L OVERDRIVE | P2: 矢印 移動・Ctrl 通常・Shift 必殺・/ OVERDRIVE', controls_ai:'P1: A/D 移動 · W ジャンプ · J 通常 · K 必殺 · L OVERDRIVE', cl_title:'コマンド一覧', cl_close:'閉じる',
+      credits_role_direction:'ディレクション＆デザイン', credits_role_engine:'エンジン＆プログラミング', credits_role_ai:'AI支援開発', credits_role_art:'アート＆AIツール', credits_role_design:'UI/UX デザイン参考', credits_role_partners:'パートナー', credits_subtitle:'アーケード格闘ゲーム', credits_thanks:'スペシャルサンクス', credits_created:'制作',
+      help_title:'ヘルプ', help_lead:'Axie Smashはローカル対戦アーケードゲームです。Axieを選び、技を使いこなし、時間切れ前に相手の体力をゼロにしましょう。',
+      help_combat_title:'バトル', help_combat:'移動、ジャンプ、攻撃を使います。通常攻撃は速く、必殺技は射程とダメージに優れます。AXPが満タンならOVERDRIVEで攻撃力を高められます。',
+      help_classes_title:'クラス', help_classes:'Kotaroは白いビーストAxieで、素早く攻撃的です。Verdozoは緑のプラントAxieで、バランス、耐久性、中距離に優れます。',
+      help_stats_title:'能力とステータス', help_stats:'タイプは戦い方、スピードは機動力、有効範囲は安全な攻撃距離、使いやすさは操作の難しさを表します。',
+      help_controls_title:'操作', help_controls:'P1: A/D移動、Wジャンプ、J通常、K必殺、L OVERDRIVE。P2: 矢印移動/ジャンプ、Ctrl通常、Shift必殺、/ OVERDRIVE。操作設定で変更できます。'
     }
   };
   function t(key) { return (LANG[settings.lang] && LANG[settings.lang][key]) || LANG.es[key] || key; }
@@ -591,6 +652,9 @@
   const ctx = canvas.getContext('2d');
   const W = canvas.width, H = canvas.height;
   const GROUND_Y = H - 100;
+  // La plataforma visible empieza 55 px debajo del horizonte del escenario.
+  const FIGHTER_GROUND_Y = GROUND_Y + 55;
+  const SPRITE_HEIGHT = 136;
   const GRAVITY = 0.7;
 
   const screens = {
@@ -599,6 +663,7 @@
     OPTIONS: document.getElementById('screen-options'),
     CONTROLS: document.getElementById('screen-controls'),
     PLAYER_DATA: document.getElementById('screen-playerdata'),
+    HELP: document.getElementById('screen-help'),
     CREDITS: document.getElementById('screen-credits'),
     CHAR_SELECT: document.getElementById('screen-charselect'),
     VICTORY: document.getElementById('screen-victory'),
@@ -626,7 +691,7 @@
   let STATE = 'TITLE';
   let optionsReturnState = 'MENU';
   let controlsReturnState = 'MENU';
-  const BACK_ALLOWED = ['MENU', 'OPTIONS', 'CONTROLS', 'PLAYER_DATA', 'CREDITS'];
+  const BACK_ALLOWED = ['MENU', 'OPTIONS', 'CONTROLS', 'PLAYER_DATA', 'HELP', 'CREDITS'];
 
   function goTo(newState) {
     STATE = newState;
@@ -643,10 +708,18 @@
     if (newState === 'OPTIONS') renderOptionsScreen();
     if (newState === 'CONTROLS') renderControlsScreen(ctrlActiveTab);
     if (newState === 'PLAYER_DATA') renderPlayerDataScreen();
+    if (newState === 'HELP') renderHelpScreen();
     if (newState === 'CREDITS') renderCreditsScreen();
     if (newState === 'CHAR_SELECT') refreshCharSelectUI();
+    if (newState === 'VICTORY') {
+      document.getElementById('rematch-btn').textContent = t('victory_rematch');
+      document.getElementById('menu-btn').textContent = t('victory_menu');
+    }
+
+    document.getElementById('press-start').textContent = t('press_start');
 
     globalBackBtn.classList.toggle('hidden', !BACK_ALLOWED.includes(newState));
+    globalBackBtn.textContent = t('back');
   }
   function handleGlobalBack() {
     AudioMgr.move();
@@ -654,6 +727,7 @@
     else if (STATE === 'OPTIONS') goTo(optionsReturnState);
     else if (STATE === 'CONTROLS') goTo(controlsReturnState);
     else if (STATE === 'PLAYER_DATA') goTo('MENU');
+    else if (STATE === 'HELP') goTo('MENU');
     else if (STATE === 'CREDITS') goTo('MENU');
   }
   globalBackBtn.addEventListener('click', handleGlobalBack);
@@ -692,10 +766,29 @@
     },
   };
   Object.entries(FIGHTER_SPRITES).forEach(([type, sprite]) => {
+    sprite.img.onload = () => prepareSpriteSheet(sprite);
     sprite.img.onerror = () => console.error(`Error cargando sprite de ${type}`);
   });
   FIGHTER_SPRITES.beast.img.src = 'sprites-blanco.png';
   FIGHTER_SPRITES.plant.img.src = 'sprites-verde.png';
+
+  // Las hojas incluyen un fondo oscuro de referencia. Se convierte una sola vez
+  // a alfa transparente y se reutiliza el canvas resultante durante todo el combate.
+  function prepareSpriteSheet(sprite) {
+    const surface = document.createElement('canvas');
+    surface.width = sprite.img.naturalWidth; surface.height = sprite.img.naturalHeight;
+    const surfaceCtx = surface.getContext('2d', { alpha:true });
+    surfaceCtx.drawImage(sprite.img, 0, 0);
+    const pixels = surfaceCtx.getImageData(0, 0, surface.width, surface.height);
+    const data = pixels.data;
+    for (let i = 0; i < data.length; i += 4) {
+      const r = data[i], g = data[i + 1], b = data[i + 2];
+      // Conserva los contornos negros del personaje y elimina únicamente el azul/verde oscuro del panel.
+      if (r < 28 && g < 42 && b < 52 && b >= r + 7) data[i + 3] = 0;
+    }
+    surfaceCtx.putImageData(pixels, 0, 0);
+    sprite.surface = surface;
+  }
 
 
   // ===========================================================
@@ -737,11 +830,12 @@
   }
   function renderStatsPanel(containerEl, type) {
     const s = CHAR_DATA[type].stats, lang = settings.lang;
+    const stat = key => s[key][lang] || s[key].en || s[key].es;
     containerEl.innerHTML =
-      '<div class="stat-row"><span class="stat-label">' + t('stat_type') + '</span><span class="stat-value">' + s.type[lang] + '</span></div>' +
-      '<div class="stat-row"><span class="stat-label">' + t('stat_speed') + '</span><span class="stat-value">' + s.speed[lang] + '</span></div>' +
-      '<div class="stat-row"><span class="stat-label">' + t('stat_range') + '</span><span class="stat-value">' + s.range[lang] + '</span></div>' +
-      '<div class="stat-row"><span class="stat-label">' + t('stat_ease') + '</span><span class="stat-value">' + s.ease[lang] + '</span></div>';
+      '<div class="stat-row"><span class="stat-label">' + t('stat_type') + '</span><span class="stat-value">' + stat('type') + '</span></div>' +
+      '<div class="stat-row"><span class="stat-label">' + t('stat_speed') + '</span><span class="stat-value">' + stat('speed') + '</span></div>' +
+      '<div class="stat-row"><span class="stat-label">' + t('stat_range') + '</span><span class="stat-value">' + stat('range') + '</span></div>' +
+      '<div class="stat-row"><span class="stat-label">' + t('stat_ease') + '</span><span class="stat-value">' + stat('ease') + '</span></div>';
   }
 
   // ===========================================================
@@ -757,7 +851,8 @@
       { id:'arcade', label:t('m_arcade'), desc:t('m_arcade_desc'), disabled:false, action: () => { gameMode='AI'; goTo('CHAR_SELECT'); } },
       { id:'versus', label:t('m_versus'), desc:t('m_versus_desc'), disabled:false, action: () => { gameMode='LOCAL'; goTo('CHAR_SELECT'); } },
       { id:'multi', label:t('m_multi'), desc:t('m_multi_desc'), disabled:true, soon:t('m_soon'), action:null },
-      { id:'pdata', label:t('m_pdata'), desc:t('m_pdata_desc'), disabled:false, action: () => goTo('PLAYER_DATA') },
+      { id:'pdata', label:t('m_pdata'), desc:t('m_pdata_desc'), disabled:false, soon:t('m_soon'), action: () => goTo('PLAYER_DATA') },
+      { id:'help', label:t('m_help'), desc:t('m_help_desc'), disabled:false, action: () => goTo('HELP') },
       { id:'controls', label:t('m_controls'), desc:t('m_controls_desc'), disabled:false, action: () => { controlsReturnState='MENU'; goTo('CONTROLS'); } },
       { id:'options', label:t('m_options'), desc:t('m_options_desc'), disabled:false, action: () => { optionsReturnState='MENU'; goTo('OPTIONS'); } },
       { id:'credits', label:t('m_credits'), desc:t('m_credits_desc'), disabled:false, action: () => goTo('CREDITS') },
@@ -819,9 +914,10 @@
     document.getElementById('opt-label-master').textContent = t('opt_master');
     document.getElementById('opt-label-sfx').textContent = t('opt_sfx');
     document.getElementById('options-save-btn').textContent = t('opt_save');
+    globalBackBtn.textContent = t('back');
     buildPillRow(optResEl, [{label:'1280x720',value:'1280x720'},{label:'1920x1080',value:'1920x1080'}], settings.resolution, v => { settings.resolution=v; applyResolutionSetting(); });
     buildPillRow(optFpsEl, [{label:'30 FPS',value:30},{label:'60 FPS',value:60}], settings.fps, v => { settings.fps=v; });
-    buildPillRow(optLangEl, [{label:'Español',value:'es'},{label:'English',value:'en'}], settings.lang, v => { settings.lang=v; });
+    buildPillRow(optLangEl, [{label:'Español',value:'es'},{label:'English',value:'en'},{label:'日本語',value:'ja'}], settings.lang, v => { settings.lang=v; });
     optMasterSlider.value = settings.masterVol; optSfxSlider.value = settings.sfxVol;
     optMasterValue.textContent = settings.masterVol; optSfxValue.textContent = settings.sfxVol;
   }
@@ -954,20 +1050,43 @@
   }
 
   // ===========================================================
+  // HELP
+  // ===========================================================
+  function renderHelpScreen() {
+    document.getElementById('help-title-text').textContent = t('help_title');
+    document.getElementById('help-lead-text').textContent = t('help_lead');
+    const cards = [
+      ['help_combat_title', 'help_combat'],
+      ['help_classes_title', 'help_classes'],
+      ['help_stats_title', 'help_stats'],
+      ['help_controls_title', 'help_controls'],
+    ];
+    document.getElementById('help-grid').innerHTML = cards.map(([title, body]) =>
+      '<article class="help-card"><h3>' + t(title) + '</h3><p>' + t(body) + '</p></article>'
+    ).join('');
+  }
+
+  // ===========================================================
   // CRÉDITOS
   // ===========================================================
   function renderCreditsScreen() {
     const el = document.getElementById('credits-crawl-content');
     const roleBlock = (role, name) => '<div class="credit-block"><div class="credit-role">' + role + '</div><div class="credit-name">' + name + '</div></div>';
     el.innerHTML =
-      '<h1>AXIE SMASH</h1><h2>VIBEATHON EDITION</h2>' +
-      roleBlock(t('credits_role_hackathon'), 'Axie VibeAthon Hackathon') +
-      roleBlock(t('credits_role_direction'), 'Equipo VibeAthon') +
-      roleBlock(t('credits_role_engine'), 'HTML5 Canvas + JavaScript Vanilla') +
-      roleBlock(t('credits_role_ai'), 'Claude Code — Anthropic') +
-      roleBlock(t('credits_role_art'), 'Sprites y animaciones proceduralmente generados') +
-      roleBlock(t('credits_role_design'), 'Marvel vs Capcom 3 · Street Fighter 6 · Ultra Street Fighter IV') +
-      '<div class="credit-block"><div class="credit-name" style="font-size:13px;color:#888;">© 2026 — Prototipo de hackathon, no oficial de Axie Infinity / Sky Mavis.</div></div>';
+      '<img class="credits-logo-img" src="axie-smash-logo.png" alt="Axie Smash">' +
+      '<h2>' + t('credits_subtitle') + '</h2>' +
+      roleBlock(t('credits_role_direction'), 'GameX') +
+      roleBlock(t('credits_role_engine'), 'HTML5 Canvas + JavaScript') +
+      roleBlock(t('credits_role_ai'), 'Codex · GameX · Claude Code — Anthropic') +
+      roleBlock(t('credits_role_art'), 'GPT · Gemini · Qwen') +
+      roleBlock(t('credits_role_design'), 'Marvel vs. Capcom 3 · Street Fighter 6 · Ultra Street Fighter IV') +
+      roleBlock(t('credits_thanks'), 'Axie Infinity · Sky Mavis') +
+      roleBlock(t('credits_created'), 'GameX') +
+      '<div class="credits-partners"><div class="credit-role">' + t('credits_role_partners') + '</div><div class="partner-logos">' +
+      '<img class="partner-logo" src="axie-infinity-logo.png" alt="Axie Infinity">' +
+      '<img class="partner-logo sky-mavis" src="sky-mavis-logo.webp" alt="Sky Mavis">' +
+      '<img class="partner-logo" src="gamex-logo.png" alt="GameX"></div></div>' +
+      '<div class="credit-block"><div class="credit-name" style="font-size:13px;color:#888;">© 2026 AXIE SMASH</div></div>';
   }
 
   // ===========================================================
@@ -1010,6 +1129,7 @@
     refreshCharSelectUI();
   }
   function refreshCharSelectUI() {
+    document.getElementById('cs-title-text').textContent = t('cs_title');
     csGridLabel.textContent = t('cs_grid_label');
     document.getElementById('btn-confirm').textContent = t('cs_confirm');
     document.getElementById('btn-back-cs').textContent = t('cs_back');
@@ -1027,6 +1147,8 @@
 
     p1PortraitLabel.textContent = CHAR_DATA[p1Selection].label.toUpperCase();
     p2PortraitLabel.textContent = CHAR_DATA[p2Selection].label.toUpperCase();
+    document.getElementById('p1-portrait-subtitle').textContent = t('kotaro_subtitle');
+    document.getElementById('p2-portrait-subtitle').textContent = t('verdozo_subtitle');
     p1PortraitImg.src = CHAR_PORTRAIT_IMG[p1Selection] || '';
     p2PortraitImg.src = CHAR_PORTRAIT_IMG[p2Selection] || '';
     p2PortraitTag.textContent = gameMode === 'AI' ? 'CPU' : '2P';
@@ -1249,7 +1371,7 @@
   // RENDERIZADO DEL ROSTER POR SPRITES
   // ===========================================================
   function isSpriteReady(sprite) {
-    return sprite.img.complete && sprite.img.naturalWidth > 0;
+    return sprite.img.complete && sprite.img.naturalWidth > 0 && !!sprite.surface;
   }
   function drawSpritePlaceholder(type) {
     ctx.save();
@@ -1277,30 +1399,31 @@
     const frameIdx = f.spriteFrame % def.count;
     const sx = def.x + frameIdx * frameW;
     const sy = def.y;
-    const dh = 140;
+    const dh = SPRITE_HEIGHT;
     const dw = frameW * (dh / def.h);
     ctx.save();
     if (flashing) ctx.globalAlpha = 0.55;
+    ctx.globalCompositeOperation = 'source-over';
     ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(sprite.img, sx, sy, frameW, def.h, -dw / 2, -dh, dw, dh);
+    ctx.drawImage(sprite.surface, sx, sy, frameW, def.h, -dw / 2, -dh, dw, dh);
     ctx.restore();
   }
 
   class Fighter {
     constructor(opts) {
-      this.x = opts.x; this.y = GROUND_Y; this.w = 70; this.h = 90;
+      this.x = opts.x; this.y = FIGHTER_GROUND_Y; this.w = 78; this.h = SPRITE_HEIGHT;
       this.facing = opts.facing; this.type = opts.type; this.label = opts.label; this.side = opts.side;
       this.vx = 0; this.vy = 0; this.baseSpeed = 4.2; this.jumpPower = -15.5; this.onGround = true;
       this.hp = 100; this.maxHp = 100; this.axp = 0; this.overdriveTimer = 0;
       this.isAttacking = false; this.attackType = null; this.attackTimer = 0; this.attackCooldown = 0; this.hitApplied = false;
       this.hurtFlash = 0; this.isDead = false; this.animTimer = 0; this.walking = false;
-      // Contador de fotogramas del sprite (solo aplica a personajes con hoja de sprites, p. ej. 'beast')
-      this.spriteTick = 0; this.spriteFrame = 0;
+      // Ambos luchadores comparten el mismo reloj de animación a 60 FPS.
+      this.spriteTick = 0; this.spriteFrame = 0; this.spriteState = 'idle';
     }
     get overdriveActive() { return this.overdriveTimer > 0; }
     get speed() { return this.baseSpeed * (this.overdriveActive ? OVERDRIVE_SPEED_MULT : 1); }
-    get hitboxWidth() { return this.attackType === 'special' ? 60 : 40; }
-    get attackRange() { return this.attackType === 'special' ? 95 : 65; }
+    get hitboxWidth() { return this.attackType === 'special' ? 72 : 52; }
+    get attackRange() { return this.attackType === 'special' ? 110 : 78; }
     startAttack(type) {
       if (this.attackCooldown > 0 || this.isAttacking || this.isDead) return;
       this.isAttacking = true; this.attackType = type; this.attackTimer = type === 'special' ? 26 : 16; this.hitApplied = false;
@@ -1316,14 +1439,16 @@
     update(opponent) {
       if (this.isDead) return;
       this.animTimer++; if (this.overdriveTimer > 0) this.overdriveTimer--;
-      // Avance del contador de fotogramas del sprite: cambia de frame cada 6 ticks
-      // (a 60 FPS eso son ~10 fotogramas por segundo, ni muy rápido ni muy lento).
+      // IDLE 7.5 FPS, WALK 12 FPS y PUNCH 15 FPS: cadencias fluidas y equivalentes.
       if (FIGHTER_SPRITES[this.type]) {
-        this.spriteTick++;
-        if (this.spriteTick >= 6) { this.spriteTick = 0; this.spriteFrame++; }
+        const nextState = this.isAttacking && this.attackType === 'basic' ? 'punch' :
+          (this.onGround && Math.abs(this.vx) > 0.5 ? 'walk' : 'idle');
+        const ticksPerFrame = nextState === 'punch' ? 4 : (nextState === 'walk' ? 5 : 8);
+        if (nextState !== this.spriteState) { this.spriteState = nextState; this.spriteTick = 0; this.spriteFrame = 0; }
+        else if (++this.spriteTick >= ticksPerFrame) { this.spriteTick = 0; this.spriteFrame++; }
       }
       this.vy += GRAVITY; this.y += this.vy;
-      if (this.y >= GROUND_Y) { this.y = GROUND_Y; this.vy = 0; this.onGround = true; } else this.onGround = false;
+      if (this.y >= FIGHTER_GROUND_Y) { this.y = FIGHTER_GROUND_Y; this.vy = 0; this.onGround = true; } else this.onGround = false;
       this.x += this.vx; this.x = Math.max(30, Math.min(W - 30 - this.w, this.x));
       if (!this.isAttacking) this.facing = (opponent.x > this.x) ? 1 : -1;
       if (this.isAttacking) {
@@ -1338,7 +1463,7 @@
     tryHit(opponent) {
       const centerX = this.x + this.w / 2 + this.facing * (this.attackRange / 2);
       const dist = Math.abs((opponent.x + opponent.w / 2) - centerX);
-      if (dist < this.hitboxWidth + opponent.w / 2 && Math.abs(opponent.y - this.y) < 60) {
+      if (dist < this.hitboxWidth + opponent.w / 2 && Math.abs(opponent.y - this.y) < Math.min(this.h, opponent.h) * 0.75) {
         let dmg = this.attackType === 'special' ? 18 : 8;
         if (this.overdriveActive) dmg = Math.round(dmg * OVERDRIVE_DMG_MULT);
         opponent.receiveDamage(dmg, this.facing); this.hitApplied = true;
@@ -1360,7 +1485,7 @@
       const drawY = baseY + bob;
       ctx.save(); ctx.translate(this.x + this.w / 2, drawY); ctx.scale(this.facing, 1);
       ctx.save(); ctx.translate(-this.x - this.w/2, -drawY);
-      ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.beginPath(); ctx.ellipse(this.x + this.w/2, GROUND_Y + 60, 36, 10, 0, 0, Math.PI*2); ctx.fill(); ctx.restore();
+      ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.beginPath(); ctx.ellipse(this.x + this.w/2, FIGHTER_GROUND_Y + 5, 40, 10, 0, 0, Math.PI*2); ctx.fill(); ctx.restore();
       if (this.overdriveActive) {
         const pulse = 0.35 + 0.2 * Math.sin(this.animTimer * 0.35);
         ctx.save(); ctx.globalAlpha = pulse; ctx.fillStyle = '#ffd54f'; ctx.beginPath(); ctx.arc(0, -55, 50, 0, Math.PI*2); ctx.fill(); ctx.restore();
